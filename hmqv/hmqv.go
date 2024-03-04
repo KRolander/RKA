@@ -140,6 +140,8 @@ func Agree(staticKeys *StaticKeys, ephemeralKeys *EphemeralKeys, staticOtherKeys
 		x_add_d_mult_a := new(big.Int)
 		x_add_d_mult_a.Add(x, d_mult_a)
 
+		// s_A = x + d.a mod q
+
 		s_A := new(big.Int)
 		s_A.Mod(x_add_d_mult_a, q)
 
