@@ -1,3 +1,6 @@
+// Authors: R. Kromes (REIT Team) & J. van Assen (Cybersecurity group)
+// TU Delft Cybersecurity group 2024
+
 package hmqv
 
 import (
@@ -59,8 +62,6 @@ func HMQV_Hash(sigma []byte, ephpub []byte, statpub []byte, hashType string) []b
 
 	return digest
 }
-
-// TODO public key validation
 
 // role : true -> Alice | false -> Bob
 // func Agree(staticPrivateKey []byte, staticPublicKey []byte, ephemeralPrivateKey []byte, ephemeralPublicKey []byte, staticOtherPublicKey []byte, ephemeralOtherPublicKey []byte, role bool) []byte {
@@ -251,6 +252,7 @@ func Agree(staticKeys *StaticKeys, ephemeralKeys *EphemeralKeys, staticOtherKeys
 	return K
 }
 
+// Verifies if the public key is valid (generated in the given Finite field)
 func isValidPublicKey(c elliptic.Curve, PublicKey_x *big.Int, PublicKey_y *big.Int) error {
 
 	if !c.IsOnCurve(PublicKey_x, PublicKey_y) {
@@ -265,7 +267,6 @@ func isValidPublicKey(c elliptic.Curve, PublicKey_x *big.Int, PublicKey_y *big.I
 }
 
 // Returns private key (as *big.Int), public key x and y coordinates (as *big.Int, *big.Int)
-
 func GenerateKeys() (*big.Int, *big.Int, *big.Int) {
 	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	if err != nil {
