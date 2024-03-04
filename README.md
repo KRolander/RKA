@@ -42,7 +42,7 @@ sigma_A = (Y . B^{e})^{x + d.a mod q}
 
 when role is set to `False` the protocol computes: 
 ```bash
-sigma_B}=(X \cdot A^{d})^{y + e.b mod q }
+sigma_B = (X \cdot A^{d})^{y + e.b mod q }
 ```
 
 To run it only at one parties side just uncomment one of the following lines:
