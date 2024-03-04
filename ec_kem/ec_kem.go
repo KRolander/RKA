@@ -1,3 +1,6 @@
+// Authors: R. Kromes (REIT Team) & J. van Assen (Cybersecurity group)
+// TU Delft Cybersecurity group 2024
+
 package ec_kem
 
 import (
