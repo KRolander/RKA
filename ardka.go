@@ -96,7 +96,9 @@ func main() {
 
 	fmt.Printf("Km1 : %x\n", Km1) // Only the x coordinate is used from sigma_B
 
-	Km2 := hmqv.Agree(&staticKeysAlice, &ephemeralKeysAlice, &staticKeysBob, &ephemeralKeysBob, false)
+	Km2 := hmqv.Agree(&staticKeysBob, &ephemeralKeysBob, &staticKeysAlice, &ephemeralKeysAlice, false)
+
+	// Km2 := hmqv.Agree(&staticKeysAlice, &ephemeralKeysAlice, &staticKeysBob, &ephemeralKeysBob, false)
 	fmt.Printf("Km2 : %x\n", Km2) // Only the x coordinate is used from sigma_B
 
 	fmt.Println("* KEM *")
