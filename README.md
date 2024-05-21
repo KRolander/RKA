@@ -32,27 +32,27 @@ go run ardka.go
 ```
 
 To note, the HMQV protocol is executed among the two parties:
-```bash 
+```go 
 Agree(staticKeys *StaticKeys, ephemeralKeys *EphemeralKeys, staticOtherKeys *StaticKeys, ephemeralOtherKeys *EphemeralKeys, role bool)
 ```
-when role is set to `True`: 
-```bash
+when role is set to `True`:
+```
 sigma_A = (Y . B^{e})^{x + d.a mod q}
 ```
 
 when role is set to `False` the protocol computes: 
-```bash
+```
 sigma_B = (X \cdot A^{d})^{y + e.b mod q }
 ```
 
 To run it only at one parties side just uncomment one of the following lines:
-```bash
+```go
 Km1 := hmqv.Agree(&staticKeysAlice, &ephemeralKeysAlice, &staticKeysBob, &ephemeralKeysBob, true)
 Km2 := hmqv.Agree(&staticKeysBob, &ephemeralKeysBob, &staticKeysAlice, &ephemeralKeysAlice, false)
 ```
 
 To note: when only one party will be run, the private key of the other party is unknown, therefore, it can be set to `nil`. For exemple when only Alice runs the HMQV protocol the following call can be applied:
-```bash
+```go
 Km1 := hmqv.Agree(&staticKeysAlice, &ephemeralKeysAlice, nil, &ephemeralKeysBob, true)
 ```
 
