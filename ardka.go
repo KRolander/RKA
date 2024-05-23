@@ -148,7 +148,7 @@ func main() {
 	fmt.Printf("Kq after ec_dekem: %x\n", Kq_dec)
 
 	// TODO Signature signing and verification
-
+	// TODO: Board keys are used instead of Alice Bobs keys
 	privA_ECDSA, pubA_ECDSA := ec_sign.StructurizeECDSAKeys(privBM, pk_BM_x_Int, pk_BM_y_Int)
 
 	// fmt.Printf("ECDSA keys:\n privKey : %x\npubKey_x : %x\npubKey_y : %x\n", privA_ECDSA, pubA_ECDSA.X, pubA_ECDSA.Y)

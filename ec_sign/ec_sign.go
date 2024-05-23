@@ -16,6 +16,14 @@ type ecdsaSignature struct {
 	S *big.Int
 }
 
+func KeyGen() (*ecdsa.PrivateKey, *ecdsa.PublicKey) {
+	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	if err != nil {
+		panic(err)
+	}
+	return StructurizeECDSAKeys(privateKey.D.Bytes(), privateKey.X, privateKey.Y)
+}
+
 // Create ECDSA key structure
 func StructurizeECDSAKeys(privkey []byte, pubkey_x *big.Int, pubkey_y *big.Int) (*ecdsa.PrivateKey, *ecdsa.PublicKey) {
 	privKey := new(ecdsa.PrivateKey)
