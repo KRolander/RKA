@@ -1,6 +1,8 @@
 package hmqv
 
 import (
+	"ardka/ec_kem"
+	"crypto/sha256"
 	"testing"
 )
 
@@ -34,6 +36,8 @@ func BenchmarkHMQV(b *testing.B) {
 	staticKeysAlice := StaticKeys{sprivA_Int, spubA_x_Int, spubA_y_Int}
 	sprivB_Int, spubB_x_Int, spubB_y_Int := GenerateKeys()
 	staticKeysBob := StaticKeys{sprivB_Int, spubB_x_Int, spubB_y_Int}
+	h := sha256.New
+
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
@@ -42,6 +46,10 @@ func BenchmarkHMQV(b *testing.B) {
 		ephemeralKeysAlice := EphemeralKeys{eprivA_Int, epubA_x_Int, epubA_y_Int}
 		eprivB_Int, epubB_x_Int, epubB_y_Int := GenerateKeys()
 		ephemeralKeysBob := EphemeralKeys{eprivB_Int, epubB_x_Int, epubB_y_Int}
-		_ = Agree(&staticKeysAlice, &ephemeralKeysAlice, &staticKeysBob, &ephemeralKeysBob, true)
+		km := Agree(&staticKeysAlice, &ephemeralKeysAlice, &staticKeysBob, &ephemeralKeysBob, true)
+		_, err := ec_kem.DeriveCommitKey(h, km, 64)
+		if err != nil {
+			b.Fail()
+		}
 	}
 }
