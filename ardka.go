@@ -60,7 +60,7 @@ func main() {
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	fmt.Printf("Ephemeral Pubkey A %x %x\n", epubA_x_Int, epubA_y_Int)
 
-	// Static Key Parir
+	// Static Key Pair
 	sprivB_Int, spubB_x_Int, spubB_y_Int := hmqv.GenerateKeys()
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	// sprivB, _ := hex.DecodeString("d9e3deed471b4067520d2f60b0b17a3a7b950d86ddee7a59b3fc5795db03e84f")
@@ -101,19 +101,6 @@ func main() {
 	// Km2 := hmqv.Agree(&staticKeysAlice, &ephemeralKeysAlice, &staticKeysBob, &ephemeralKeysBob, false)
 	fmt.Printf("Km2 : %x\n", Km2) // Only the x coordinate is used from sigma_B
 
-	fmt.Println("* KEM *")
-
-	privBM, _ := hex.DecodeString("a43c04265da1d83ff5af28f65505544ac85df6e0dcd1344ee3783cc315f3a61e")
-	// Generate Static Pubkey of Board Member (BM)
-	privBM_Int := new(big.Int)
-	privBM_Int.SetBytes(privBM)
-
-	pk_BM_x_Int, pk_BM_y_Int := c.ScalarBaseMult(privBM_Int.Bytes())
-
-	pk_BM := make([]byte, 0)
-	pk_BM = append(pk_BM, pk_BM_x_Int.Bytes()...)
-	pk_BM = append(pk_BM, pk_BM_y_Int.Bytes()...)
-
 	r, err := ec_kem.DeriveCommitKey(h, Km1, 64)
 
 	r1 := r[:32]
@@ -126,6 +113,19 @@ func main() {
 
 	fmt.Printf("r1 : %x\n", r1)
 	fmt.Printf("r2 : %x\n", r2)
+
+	fmt.Println("* KEM *")
+
+	privBM, _ := hex.DecodeString("a43c04265da1d83ff5af28f65505544ac85df6e0dcd1344ee3783cc315f3a61e")
+	// Generate Static Pubkey of Board Member (BM)
+	privBM_Int := new(big.Int)
+	privBM_Int.SetBytes(privBM)
+
+	pk_BM_x_Int, pk_BM_y_Int := c.ScalarBaseMult(privBM_Int.Bytes())
+
+	pk_BM := make([]byte, 0)
+	pk_BM = append(pk_BM, pk_BM_x_Int.Bytes()...)
+	pk_BM = append(pk_BM, pk_BM_y_Int.Bytes()...)
 
 	Cr, Kr := ec_kem.EC_kem(c, r1, pk_BM)
 

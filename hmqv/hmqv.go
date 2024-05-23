@@ -28,6 +28,10 @@ type EphemeralKeys struct {
 	PublicKey_y *big.Int
 }
 
+func KeyGen() {
+
+}
+
 // To compute d = H(X, \hat{B}) or e = H(Y, \hat{A}) the sigma must be nil; half of the hash digests returned
 // To compute sigma -> ephpub = nil ; statpub = nil -> only x coordinate of sigma is requiered as input -> entier hash digests returned
 func HMQV_Hash(sigma []byte, ephpub []byte, statpub []byte, hashType string) []byte {
