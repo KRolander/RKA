@@ -3,6 +3,7 @@ package main
 import (
 	"ardka/ec_kem"
 	"ardka/ec_sign"
+	"ardka/hmqv"
 	"bytes"
 	"crypto/elliptic"
 	"crypto/sha256"
@@ -10,6 +11,30 @@ import (
 	"math/big"
 	"testing"
 )
+
+func BenchmarkHMQV(b *testing.B) {
+	// Setup
+	sprivA_Int, spubA_x_Int, spubA_y_Int := hmqv.GenerateKeys()
+	staticKeysAlice := hmqv.StaticKeys{sprivA_Int, spubA_x_Int, spubA_y_Int}
+	sprivB_Int, spubB_x_Int, spubB_y_Int := hmqv.GenerateKeys()
+	staticKeysBob := hmqv.StaticKeys{sprivB_Int, spubB_x_Int, spubB_y_Int}
+	h := sha256.New
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		// Epheremal keys
+		eprivA_Int, epubA_x_Int, epubA_y_Int := hmqv.GenerateKeys()
+		ephemeralKeysAlice := hmqv.EphemeralKeys{eprivA_Int, epubA_x_Int, epubA_y_Int}
+		eprivB_Int, epubB_x_Int, epubB_y_Int := hmqv.GenerateKeys()
+		ephemeralKeysBob := hmqv.EphemeralKeys{eprivB_Int, epubB_x_Int, epubB_y_Int}
+		km := hmqv.Agree(&staticKeysAlice, &ephemeralKeysAlice, &staticKeysBob, &ephemeralKeysBob, true)
+		_, err := ec_kem.DeriveCommitKey(h, km, 64)
+		if err != nil {
+			b.Fail()
+		}
+	}
+}
 
 func BenchmarkSKEM(b *testing.B) {
 	c := elliptic.P256()
