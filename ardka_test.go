@@ -3,6 +3,7 @@ package main
 import (
 	"ardka/ec_kem"
 	"ardka/ec_sign"
+	"bytes"
 	"crypto/elliptic"
 	"crypto/sha256"
 	"encoding/hex"
@@ -40,7 +41,7 @@ func BenchmarkSKEM(b *testing.B) {
 	}
 }
 
-func BenchmarkStep3(b *testing.B) {
+func BenchmarkSign(b *testing.B) {
 	privA_ECDSA, _ := ec_sign.KeyGen()
 	c, err := hex.DecodeString("fefcb63981a0ead2fcae71c63c7ea4917b67f57db1b79bb109bf862da35975d7")
 	if err != nil {
@@ -53,5 +54,45 @@ func BenchmarkStep3(b *testing.B) {
 		H_Cr := H.Sum(nil)
 		R, S := ec_sign.Sign(privA_ECDSA, H_Cr)
 		_ = ec_sign.Compress_Signature(R, S)
+	}
+}
+
+func BenchmarkVerify(b *testing.B) {
+	// Setup
+	privA_ECDSA, pubA_ECDSA := ec_sign.KeyGen()
+
+	// Create ground truth
+	c, err := hex.DecodeString("fefcb63981a0ead2fcae71c63c7ea4917b67f57db1b79bb109bf862da35975d7")
+	if err != nil {
+		b.Fail()
+	}
+	H := sha256.New()
+	H.Write(c)
+	H_c := H.Sum(nil)
+	R, S := ec_sign.Sign(privA_ECDSA, H_c)
+
+	// Create comparison such that the first will succeed, and the second will fail
+	c_p := make([]byte, 0)
+	_ = copy(c_p, c)
+	l, err := hex.DecodeString("fefcb63981a0ead2fcae71c63c7ea4917b67f57db1b79bb109bf862da35975d8")
+	if err != nil {
+		b.Fail()
+	}
+
+	b.ResetTimer()
+	// Simulate
+	for i := 0; i < b.N; i++ {
+		H = sha256.New()
+		H.Write(l)
+
+		if bytes.Equal(c_p, c) && ec_sign.Verify(pubA_ECDSA, H_c, R, S) {
+			b.Fail()
+		} else {
+			H := sha256.New()
+			H.Write(c)
+			H_Cr := H.Sum(nil)
+			R, S := ec_sign.Sign(privA_ECDSA, H_Cr)
+			_ = ec_sign.Compress_Signature(R, S)
+		}
 	}
 }
