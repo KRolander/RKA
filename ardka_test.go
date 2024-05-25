@@ -59,6 +59,7 @@ func BenchmarkSKEM(b *testing.B) {
 	if err != nil {
 		b.Fail()
 	}
+	//fmt.Println(b.N)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_, _ = ec_kem.EC_kem(c, r1, pk_BM)
