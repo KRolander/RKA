@@ -92,7 +92,8 @@ func BenchmarkSign(b *testing.B) {
 
 func BenchmarkVerify(b *testing.B) {
 	// Setup
-	privA_ECDSA, pubA_ECDSA := ec_sign.KeyGen()
+	privA_ECDSA, _ := ec_sign.KeyGen()
+	_, pubB_ECDSA := ec_sign.KeyGen()
 
 	// Create ground truth
 	c, err := hex.DecodeString("fefcb63981a0ead2fcae71c63c7ea4917b67f57db1b79bb109bf862da35975d7")
@@ -107,26 +108,25 @@ func BenchmarkVerify(b *testing.B) {
 	// Create comparison such that the first will succeed, and the second will fail
 	c_p := make([]byte, 0)
 	_ = copy(c_p, c)
-	l, err := hex.DecodeString("fefcb63981a0ead2fcae71c63c7ea4917b67f57db1b79bb109bf862da35975d8")
-	if err != nil {
-		b.Fail()
-	}
 
 	b.ResetTimer()
 	// Simulate
 	for i := 0; i < b.N; i++ {
 		H = sha256.New()
-		H.Write(l)
-
-		if bytes.Equal(c_p, c) && ec_sign.Verify(pubA_ECDSA, H_c, R, S) {
+		H.Write(c)
+		H_rk := H.Sum(nil)
+		if !bytes.Equal(c, c_p) {
 			b.Fail()
-		} else {
-			H := sha256.New()
-			H.Write(c)
-			H_Cr := H.Sum(nil)
-			R, S := ec_sign.Sign(privA_ECDSA, H_Cr)
-			_ = ec_sign.Compress_Signature(R, S)
 		}
+		if !ec_sign.Verify(pubB_ECDSA, H_rk, R, S) {
+			b.Fail()
+		}
+		// Else block
+		H = sha256.New()
+		H.Write([]byte("REJECT"))
+		H_msg := H.Sum(nil)
+		R_msg, S_msg := ec_sign.Sign(privA_ECDSA, H_msg)
+		_ = ec_sign.Compress_Signature(R_msg, S_msg)
 	}
 }
 
