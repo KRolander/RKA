@@ -1,0 +1,41 @@
+goos: linux
+goarch: arm
+pkg: ardka
+BenchmarkSetup-4    	   10000	   2186587 ns/op	    1304 B/op	      37 allocs/op
+BenchmarkSetup-4    	   10000	   2195182 ns/op	    1305 B/op	      37 allocs/op
+BenchmarkSetup-4    	   10000	   2186558 ns/op	    1305 B/op	      37 allocs/op
+BenchmarkSetup-4    	   10000	   2195085 ns/op	    1304 B/op	      37 allocs/op
+BenchmarkSetup-4    	   10000	   2186698 ns/op	    1305 B/op	      37 allocs/op
+BenchmarkSetup-4    	   10000	   2194372 ns/op	    1304 B/op	      37 allocs/op
+BenchmarkHMQV-4     	   10000	  10412178 ns/op	    6007 B/op	     132 allocs/op
+BenchmarkHMQV-4     	   10000	  10414159 ns/op	    6007 B/op	     132 allocs/op
+BenchmarkHMQV-4     	   10000	  10412254 ns/op	    6007 B/op	     132 allocs/op
+BenchmarkHMQV-4     	   10000	  10411273 ns/op	    6007 B/op	     132 allocs/op
+BenchmarkHMQV-4     	   10000	  10412350 ns/op	    6007 B/op	     132 allocs/op
+BenchmarkHMQV-4     	   10000	  10409127 ns/op	    6007 B/op	     132 allocs/op
+BenchmarkSKEM-4     	   10000	  10084906 ns/op	    2432 B/op	      64 allocs/op
+BenchmarkSKEM-4     	   10000	  10084033 ns/op	    2432 B/op	      64 allocs/op
+BenchmarkSKEM-4     	   10000	  10090932 ns/op	    2432 B/op	      64 allocs/op
+BenchmarkSKEM-4     	   10000	  10085888 ns/op	    2432 B/op	      64 allocs/op
+BenchmarkSKEM-4     	   10000	  10085068 ns/op	    2432 B/op	      64 allocs/op
+BenchmarkSKEM-4     	   10000	  10085996 ns/op	    2432 B/op	      64 allocs/op
+BenchmarkSign-4     	   10000	   1426220 ns/op	    4131 B/op	      63 allocs/op
+BenchmarkSign-4     	   10000	   1427529 ns/op	    4131 B/op	      63 allocs/op
+BenchmarkSign-4     	   10000	   1426297 ns/op	    4131 B/op	      63 allocs/op
+BenchmarkSign-4     	   10000	   1433464 ns/op	    4131 B/op	      63 allocs/op
+BenchmarkSign-4     	   10000	   1434424 ns/op	    4131 B/op	      63 allocs/op
+BenchmarkSign-4     	   10000	   1429588 ns/op	    4131 B/op	      63 allocs/op
+BenchmarkVerify-4   	   10000	   6334089 ns/op	    5889 B/op	     106 allocs/op
+BenchmarkVerify-4   	   10000	   6333289 ns/op	    5889 B/op	     106 allocs/op
+BenchmarkVerify-4   	   10000	   6336844 ns/op	    5889 B/op	     106 allocs/op
+BenchmarkVerify-4   	   10000	   6333317 ns/op	    5889 B/op	     106 allocs/op
+BenchmarkVerify-4   	   10000	   6335233 ns/op	    5889 B/op	     106 allocs/op
+BenchmarkVerify-4   	   10000	   6333433 ns/op	    5889 B/op	     106 allocs/op
+BenchmarkAKE-4      	   10000	  27262294 ns/op	   17997 B/op	     351 allocs/op
+BenchmarkAKE-4      	   10000	  27267428 ns/op	   17998 B/op	     351 allocs/op
+BenchmarkAKE-4      	   10000	  27263628 ns/op	   17997 B/op	     351 allocs/op
+BenchmarkAKE-4      	   10000	  27267320 ns/op	   17997 B/op	     351 allocs/op
+BenchmarkAKE-4      	   10000	  27261082 ns/op	   17997 B/op	     351 allocs/op
+BenchmarkAKE-4      	   10000	  27260629 ns/op	   17998 B/op	     351 allocs/op
+PASS
+ok  	ardka	4727.445s
