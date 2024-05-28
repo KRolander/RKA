@@ -1,0 +1,42 @@
+goos: linux
+goarch: amd64
+pkg: ardka
+cpu: 13th Gen Intel(R) Core(TM) i7-1365U
+BenchmarkSetup-12     	   10000	     19801 ns/op	    1985 B/op	      33 allocs/op
+BenchmarkSetup-12     	   10000	     19784 ns/op	    1985 B/op	      34 allocs/op
+BenchmarkSetup-12     	   10000	     19872 ns/op	    1985 B/op	      33 allocs/op
+BenchmarkSetup-12     	   10000	     19686 ns/op	    1985 B/op	      34 allocs/op
+BenchmarkSetup-12     	   10000	     21993 ns/op	    1985 B/op	      34 allocs/op
+BenchmarkSetup-12     	   10000	     21833 ns/op	    1985 B/op	      33 allocs/op
+BenchmarkHMQV-12      	   10000	    106366 ns/op	    7083 B/op	     111 allocs/op
+BenchmarkHMQV-12      	   10000	    100750 ns/op	    7083 B/op	     111 allocs/op
+BenchmarkHMQV-12      	   10000	     98202 ns/op	    7083 B/op	     111 allocs/op
+BenchmarkHMQV-12      	   10000	     97178 ns/op	    7083 B/op	     111 allocs/op
+BenchmarkHMQV-12      	   10000	     97252 ns/op	    7083 B/op	     111 allocs/op
+BenchmarkHMQV-12      	   10000	     97051 ns/op	    7083 B/op	     111 allocs/op
+BenchmarkSKEM-12      	   10000	     92251 ns/op	    2784 B/op	      52 allocs/op
+BenchmarkSKEM-12      	   10000	     92106 ns/op	    2784 B/op	      52 allocs/op
+BenchmarkSKEM-12      	   10000	     93734 ns/op	    2784 B/op	      52 allocs/op
+BenchmarkSKEM-12      	   10000	     92512 ns/op	    2784 B/op	      52 allocs/op
+BenchmarkSKEM-12      	   10000	     96949 ns/op	    2784 B/op	      52 allocs/op
+BenchmarkSKEM-12      	   10000	     91875 ns/op	    2784 B/op	      52 allocs/op
+BenchmarkSign-12      	   10000	     17220 ns/op	    2839 B/op	      42 allocs/op
+BenchmarkSign-12      	   10000	     17139 ns/op	    2839 B/op	      42 allocs/op
+BenchmarkSign-12      	   10000	     16461 ns/op	    2839 B/op	      42 allocs/op
+BenchmarkSign-12      	   10000	     16917 ns/op	    2840 B/op	      42 allocs/op
+BenchmarkSign-12      	   10000	     16592 ns/op	    2840 B/op	      42 allocs/op
+BenchmarkSign-12      	   10000	     16712 ns/op	    2840 B/op	      42 allocs/op
+BenchmarkVerify-12    	   10000	     65985 ns/op	    4080 B/op	      66 allocs/op
+BenchmarkVerify-12    	   10000	     66600 ns/op	    4079 B/op	      66 allocs/op
+BenchmarkVerify-12    	   10000	     65645 ns/op	    4079 B/op	      66 allocs/op
+BenchmarkVerify-12    	   10000	     66201 ns/op	    4080 B/op	      66 allocs/op
+BenchmarkVerify-12    	   10000	     67034 ns/op	    4079 B/op	      66 allocs/op
+BenchmarkVerify-12    	   10000	     65854 ns/op	    4080 B/op	      66 allocs/op
+BenchmarkAKE-12       	   10000	    278424 ns/op	   16048 B/op	     258 allocs/op
+BenchmarkAKE-12       	   10000	    279791 ns/op	   16048 B/op	     258 allocs/op
+BenchmarkAKE-12       	   10000	    286719 ns/op	   16048 B/op	     258 allocs/op
+BenchmarkAKE-12       	   10000	    285310 ns/op	   16047 B/op	     258 allocs/op
+BenchmarkAKE-12       	   10000	    283630 ns/op	   16047 B/op	     258 allocs/op
+BenchmarkAKE-12       	   10000	    295275 ns/op	   16048 B/op	     258 allocs/op
+PASS
+ok  	ardka	48.746s
