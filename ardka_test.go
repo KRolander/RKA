@@ -93,7 +93,7 @@ func BenchmarkSign(b *testing.B) {
 func BenchmarkVerify(b *testing.B) {
 	// Setup
 	privA_ECDSA, _ := ec_sign.KeyGen()
-	_, pubB_ECDSA := ec_sign.KeyGen()
+	privB_ECDSA, pubB_ECDSA := ec_sign.KeyGen()
 
 	// Create ground truth
 	c, err := hex.DecodeString("fefcb63981a0ead2fcae71c63c7ea4917b67f57db1b79bb109bf862da35975d7")
@@ -103,10 +103,10 @@ func BenchmarkVerify(b *testing.B) {
 	H := sha256.New()
 	H.Write(c)
 	H_c := H.Sum(nil)
-	R, S := ec_sign.Sign(privA_ECDSA, H_c)
+	R, S := ec_sign.Sign(privB_ECDSA, H_c)
 
 	// Create comparison such that the first will succeed, and the second will fail
-	c_p := make([]byte, 0)
+	c_p := make([]byte, len(c))
 	_ = copy(c_p, c)
 
 	b.ResetTimer()
