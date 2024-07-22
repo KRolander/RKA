@@ -130,7 +130,7 @@ func BenchmarkVerify(b *testing.B) {
 	}
 }
 
-func BenchmarkAKE(b *testing.B) {
+func BenchmarkRKA(b *testing.B) {
 	h := sha256.New
 	c := elliptic.P256()
 
