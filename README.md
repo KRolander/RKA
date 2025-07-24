@@ -1,10 +1,14 @@
-# ARDKA
+# RKA
 
 
-## Auditable, Recoverable and Distributed Key Agreement for Medical Data Sharing
+## Recoverable Key Agreement
 
-This is a Golang implementation of our Auditable, Recoverable and Distributed Key Agreement for Medical Data Sharing (ARDKA) protocol. The protocl combines HMQV, EC-KEM and ECDSA protocols.
+This protocol allows to generate a recoverable secret key for two participants and allows its recoverability for a trusted-third-party. This protocol is the core of the "Auditable, Recoverable and Distributed Key Agreement for Medical Data Sharing" protocol that was published at the 6th Conference on Blockchain Research & Applications for Innovative Networks and Services (BRAINS) - ["Auditable Medical Data Sharing through Recoverable Key Agreement"](https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10732363) - or [via TU Delft Repository - open-access](https://repository.tudelft.nl/file/File_4af7eaec-735e-4330-aa27-bf8d5e63417e)
 
+The protocl combines HMQV, EC-KEM and ECDSA protocols.
+This is a Golang implementation of our Auditable, Recoverable and Distributed Key Agreement for Medical Data Sharing (ARDKA) protocol. To note that the distributed feature is "simulated" for a real use case scenario the implementation of the interactions with a distributed ledger is required.   
+
+The core repository is also available at [septoneu/ardka](https://github.com/septoneu/ardka).
 
 ## Dependence 
 
