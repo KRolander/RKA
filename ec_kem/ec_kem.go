@@ -5,11 +5,16 @@ package ec_kem
 
 import (
 	"crypto/elliptic"
+	"crypto/rand"
+	"fmt"
+	"io"
 
 	"errors"
 	"hash"
 	"math/big"
 
+	"github.com/cloudflare/circl/dh/x25519"
+	"golang.org/x/crypto/curve25519"
 	"golang.org/x/crypto/hkdf"
 )
 
@@ -84,4 +89,55 @@ func EC_dekem(c elliptic.Curve, q []byte, C []byte) []byte {
 	K = append(K, Ky.Bytes()...)
 
 	return K
+}
+
+// EC-KEM with x25519 curve - which is a safe curve, other arithmetics of "crypto/elliptic"
+// cannot be computed safely - DEPRICATED !
+
+// q is the recipient private key
+// C is the encapsulated key
+// returns K the initially encapsulated secret key used for data exchange
+// K = q * C -> K = q * (r*G) -> K = r*(q*G) -> K = r * Q
+func EC_dekem_x25519(q []byte, C []byte) ([]byte, error) {
+
+	SK, err := curve25519.X25519(q, C)
+	if err != nil {
+		return nil, fmt.Errorf("error in ScalarMult")
+	}
+
+	return SK, nil
+
+}
+
+// EC-KEM with x25519 curve - which is a safe curve, other arithmetics of "crypto/elliptic"
+// cannot be computed safely - DEPRICATED !
+// In the original ecies-kem scheme r is generated in the scheme (randomly picked up)
+// In this version the r is an argument (r must be random)
+// Q is the recipient's public key
+// C is the encapsulated key -> (r), the recipiet (Q, q) can compute K = q * C -> q * (r * G) -> K = r*Q
+// K used as secret key for data encryption
+
+func EC_kem_x25519(r []byte, Q []byte) ([]byte, []byte, error) {
+
+	C, err := curve25519.X25519(r, curve25519.Basepoint)
+	if err != nil {
+		return nil, nil, fmt.Errorf("error in ScalarBaseMult")
+	}
+
+	SK, err := curve25519.X25519(r, Q)
+	if err != nil {
+		return nil, nil, fmt.Errorf("error in ScalarMult")
+	}
+
+	return C, SK, nil
+
+}
+
+func GenKeyPair_curve25519() (x25519.Key, x25519.Key) {
+	var pub x25519.Key
+	var priv x25519.Key
+	_, _ = io.ReadFull(rand.Reader, priv[:])
+	x25519.KeyGen(&pub, &priv)
+
+	return priv, pub
 }
