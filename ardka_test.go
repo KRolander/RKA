@@ -5,11 +5,15 @@ import (
 	"ardka/ec_sign"
 	"ardka/hmqv"
 	"bytes"
+	"crypto/ed25519"
 	"crypto/elliptic"
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 	"math/big"
 	"testing"
+
+	"filippo.io/edwards25519"
 )
 
 func BenchmarkSetup(b *testing.B) {
@@ -218,6 +222,146 @@ func BenchmarkRKA(b *testing.B) {
 		H_msg := H.Sum(nil)
 		R_msg, S_msg := ec_sign.Sign(privA_ECDSA, H_msg)
 		_ = ec_sign.Compress_Signature(R_msg, S_msg)
+	}
+
+}
+
+func Test_RKA_edwards25519(t *testing.T) {
+	h := sha256.New
+
+	// Generate Static Pubkey of Board Member (BM)
+	priv_BM, pub_BM, err := hmqv.GenerateKeyPair_edwards25519_()
+	if err != nil {
+		t.Errorf("Error in GenerateKeyPair_edwards25519_()!")
+	}
+
+	// Generate Static keys
+	sprivA, spubA, err := hmqv.GenerateKeyPair_edwards25519_()
+	if err != nil {
+		t.Errorf("Error: %v\n", err)
+	}
+	staticKeysAlice := hmqv.StaticKeys_edwards25519{PrivateKey: sprivA, PublicKey: spubA}
+
+	sprivB, spubB, err := hmqv.GenerateKeyPair_edwards25519_()
+	if err != nil {
+		t.Errorf("Error: %v\n", err)
+	}
+	staticKeysBob := hmqv.StaticKeys_edwards25519{PrivateKey: sprivB, PublicKey: spubB}
+
+	// Signature Keys
+	priv_A, pub_A, err := hmqv.GenerateKeyPair_edwards25519_()
+	if err != nil {
+		t.Errorf("Error in GenerateKeyPair_edwards25519_()!")
+	}
+
+	////////////////////////////////////////////////////
+
+	fmt.Println("* Agreed keys *")
+
+	eprivA, epubA, err := hmqv.GenerateKeyPair_edwards25519_()
+	if err != nil {
+		t.Errorf("Error: %v\n", err)
+	}
+	ephemeralKeysAlice := hmqv.EphemeralKeys_edwards25519{PrivateKey: eprivA, PublicKey: epubA}
+
+	eprivB, epubB, err := hmqv.GenerateKeyPair_edwards25519_()
+	if err != nil {
+		t.Errorf("Error: %v\n", err)
+	}
+	ephemeralKeysBob := hmqv.EphemeralKeys_edwards25519{PrivateKey: eprivB, PublicKey: epubB}
+
+	km_a, err := hmqv.Agree_edwards25519(&staticKeysAlice, &ephemeralKeysAlice, &staticKeysBob, &ephemeralKeysBob, true)
+	if err != nil {
+		t.Errorf("Error: %v\n", err)
+	}
+	fmt.Printf("Alice - Km: %x\n", km_a)
+
+	km_b, err := hmqv.Agree_edwards25519(&staticKeysBob, &ephemeralKeysBob, &staticKeysAlice, &ephemeralKeysAlice, false)
+	if err != nil {
+		t.Errorf("Error: %v\n", err)
+	}
+	fmt.Printf("Bob - Km: %x\n", km_b)
+
+	// Step 1
+
+	r, err := ec_kem.DeriveCommitKey(h, km_a, 64)
+	if err != nil {
+		t.Errorf("Error: %v\n", err)
+	}
+	fmt.Printf("Derived key (r) %x\n", r)
+
+	r1, err := new(edwards25519.Scalar).SetBytesWithClamping(r[:32])
+	if err != nil {
+		t.Errorf("error in SetBytesWithClamping (unformated)- %v", err)
+	}
+
+	r2, err := new(edwards25519.Scalar).SetBytesWithClamping(r[32:])
+	if err != nil {
+		t.Errorf("error in SetBytesWithClamping (unformated)- %v", err)
+	}
+
+	fmt.Println("* KEM *")
+
+	// Step 2
+
+	Cr, Kr, err := ec_kem.EC_KEM_edwards25519(r1.Bytes(), pub_BM)
+	if err != nil {
+		t.Errorf("Error: %v\n", err)
+	}
+
+	fmt.Printf("Cr : %x\n", Cr)
+	fmt.Printf("Kr : %x\n", Kr)
+
+	Cq, Kq, err := ec_kem.EC_KEM_edwards25519(r2.Bytes(), pub_BM)
+	if err != nil {
+		t.Errorf("Error: %v\n", err)
+	}
+
+	fmt.Printf("Cq : %x\n", Cq)
+	fmt.Printf("Kq : %x\n", Kq)
+
+	fmt.Println("* DE-KEM *")
+
+	Kr_dec, err := ec_kem.EC_DEKEM_edwards25519(priv_BM, Cr)
+	if err != nil {
+		t.Errorf("Error: %v\n", err)
+	}
+
+	fmt.Printf("Kr after ec_dekem: %x\n", Kr_dec)
+
+	Kq_dec, err := ec_kem.EC_DEKEM_edwards25519(priv_BM, Cq)
+	if err != nil {
+		t.Errorf("Error: %v\n", err)
+	}
+	fmt.Printf("Kq after ec_dekem: %x\n", Kq_dec)
+
+	// Step 3
+	// H := sha256.New()
+	// H.Write(Kq)
+	// H_Kq := H.Sum(nil)
+
+	// H := sha256.New()
+	// H.Write(Kr)
+	// H_Kr := H.Sum(nil)
+
+	_priv_A := ec_sign.Format_edwards25519_priv(priv_A, pub_A)
+
+	sigma_Cr := ec_sign.Sign_edwards25519(_priv_A, Kr)
+	sigma_Cq := ec_sign.Sign_edwards25519(_priv_A, Kq)
+
+	fmt.Printf("Signature sigma_Cr: %x\n", sigma_Cr)
+	fmt.Printf("Signature sigma_Cq: %x\n", sigma_Cq)
+
+	if !ed25519.Verify(pub_A, Kr, sigma_Cr) {
+		t.Errorf("The signature sigma_Cr is not valid !")
+	} else {
+		fmt.Printf("The signature sigma_Cr is valid !\n")
+	}
+
+	if !ed25519.Verify(pub_A, Kq, sigma_Cq) {
+		t.Errorf("The signature sigma_Cq is not valid !")
+	} else {
+		fmt.Printf("The signature sigma_Cq is valid !\n")
 	}
 
 }
