@@ -4,6 +4,8 @@
 package ec_kem
 
 import (
+	"ardka/hmqv"
+	"crypto/ed25519"
 	"crypto/elliptic"
 	"crypto/rand"
 	"fmt"
@@ -144,21 +146,27 @@ func GenKeyPair_curve25519() (x25519.Key, x25519.Key) {
 }
 
 func GenerateKeyPair_edwards25519() ([]byte, []byte, error) {
-	var privKeyBytes [32]byte
-	_, _ = io.ReadFull(rand.Reader, privKeyBytes[:])
-
-	privateKey, err := new(edwards25519.Scalar).SetBytesWithClamping(privKeyBytes[:])
+	_, priv, err := ed25519.GenerateKey(rand.Reader)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	// pub = privateKey * B, where B is the base point
-	pub := new(edwards25519.Point).ScalarBaseMult(privateKey)
+	return priv.Seed(), priv.Public().(ed25519.PublicKey), nil
+	// var privKeyBytes [32]byte
+	// _, _ = io.ReadFull(rand.Reader, privKeyBytes[:])
 
-	// Canonical 32-byte encoding of v
-	pubKey := pub.Bytes()
+	// privateKey, err := new(edwards25519.Scalar).SetBytesWithClamping(privKeyBytes[:])
+	// if err != nil {
+	// 	return nil, nil, err
+	// }
 
-	return privateKey.Bytes(), pubKey, err
+	// // pub = privateKey * B, where B is the base point
+	// pub := new(edwards25519.Point).ScalarBaseMult(privateKey)
+
+	// // Canonical 32-byte encoding of v
+	// pubKey := pub.Bytes()
+
+	// return privateKey.Bytes(), pubKey, err
 
 }
 
@@ -200,7 +208,8 @@ func EC_KEM_edwards25519(r []byte, Q []byte) ([]byte, []byte, error) {
 // K = q * C -> K = q * (r*G) -> K = r*(q*G) -> K = r * Q
 func EC_DEKEM_edwards25519(q []byte, C []byte) ([]byte, error) {
 
-	q_scalar, err := new(edwards25519.Scalar).SetCanonicalBytes(q)
+	// q_scalar, err := new(edwards25519.Scalar).SetCanonicalBytes(q)
+	q_scalar, err := hmqv.Construct_RFC8032_Scalar(q)
 	if err != nil {
 		return nil, fmt.Errorf("error in SetCanonicalBytes - %v", err)
 	}
