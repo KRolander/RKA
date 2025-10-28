@@ -5,6 +5,7 @@ package ec_sign
 
 import (
 	"crypto/ecdsa"
+	"crypto/ed25519"
 	"crypto/elliptic"
 	"crypto/rand"
 	"math/big"
@@ -67,4 +68,14 @@ func Uncompress_Signature(sigma []byte) (r *big.Int, s *big.Int) {
 	sigmaS := new(big.Int).SetBytes(sigma[32:])
 
 	return sigmaR, sigmaS
+}
+
+// Compute edwards25519 signature
+func Sign_edwards25519(priv_ed25519 ed25519.PrivateKey, message []byte) []byte {
+	return ed25519.Sign(priv_ed25519, message)
+}
+
+// Verfiy edwards25519 signature
+func Verify_edwards25519(pub_edwards25519 ed25519.PublicKey, message []byte, signature []byte) bool {
+	return ed25519.Verify(pub_edwards25519, message, signature)
 }
