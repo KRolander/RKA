@@ -5,6 +5,7 @@ package hmqv
 
 import (
 	"crypto/ecdsa"
+	"crypto/ed25519"
 	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/sha256"
@@ -296,6 +297,27 @@ func GenerateKeys() (*big.Int, *big.Int, *big.Int) {
 
 }
 
+// RFC-8032 scalar creation
+// The 'unformated' is 32 octets (256 bits).
+// Hash the 32-byte 'unformated' using SHA-512, storing the digest in a 64-octet large buffer, denoted h.
+// SetBytesWithClamping() applies the appies buffer pruning
+func Construct_RFC8032_Scalar(unformated []byte) (*edwards25519.Scalar, error) {
+	hashLen := 32
+
+	hash := sha512.New()
+	hash.Write(unformated)
+	digests := hash.Sum(nil)
+
+	digests_32 := digests[:hashLen]
+
+	climped_digests_32, err := new(edwards25519.Scalar).SetBytesWithClamping(digests_32)
+	if err != nil {
+		return nil, fmt.Errorf("error in SetBytesWithClamping (unformated)- %v", err)
+	}
+
+	return climped_digests_32, nil
+}
+
 // HMQV protocol based on Edwards255199
 // This version is an extension of our library since the Agree() function uses elliptic curve arithmetics from cypto/elliptic whihc are depricated - not safe agains timing attacks
 // Edwards25519 arithmetics from filippo.io/edwards25519 are computed in constant time making it safe agains timing attacks
@@ -312,7 +334,6 @@ func Agree_edwards25519(staticKeys *StaticKeys_edwards25519, ephemeralKeys *Ephe
 		eprivA := ephemeralKeys.PrivateKey
 		X := ephemeralKeys.PublicKey
 
-		// B is normally known in advance - Y is exchanged
 		B_bytes := staticOtherKeys.PublicKey
 		Y_bytes := ephemeralOtherKeys.PublicKey
 
@@ -326,9 +347,9 @@ func Agree_edwards25519(staticKeys *StaticKeys_edwards25519, ephemeralKeys *Ephe
 			return nil, fmt.Errorf("error in SetBytes - %v", err)
 		}
 
-		e_bytes := HMQV_Hash(nil, Y_bytes, A, "sha512")
+		e_bytes := HMQV_Hash(nil, Y.Bytes(), A, "sha512")
 
-		d_bytes := HMQV_Hash(nil, X, B_bytes, "sha512")
+		d_bytes := HMQV_Hash(nil, X, B.Bytes(), "sha512")
 
 		e, err := new(edwards25519.Scalar).SetBytesWithClamping(e_bytes)
 		if err != nil {
@@ -340,20 +361,22 @@ func Agree_edwards25519(staticKeys *StaticKeys_edwards25519, ephemeralKeys *Ephe
 			return nil, fmt.Errorf("error in SetCanonicalBytes (d)- %v", err)
 		}
 
-		x, err := new(edwards25519.Scalar).SetCanonicalBytes(eprivA)
+		x, err := Construct_RFC8032_Scalar(eprivA)
 		if err != nil {
 			return nil, fmt.Errorf("error in SetCanonicalBytes (x)- %v", err)
 		}
 
-		a, err := new(edwards25519.Scalar).SetCanonicalBytes(sprivA)
+		a, err := Construct_RFC8032_Scalar(sprivA)
 		if err != nil {
 			return nil, fmt.Errorf("error in SetCanonicalBytes (a)- %v", err)
 		}
-
 		//Compute s_A = x + d.a mod I
 
-		s_A := new(edwards25519.Scalar).MultiplyAdd(d, a, x) // s = x * y + z mod l
+		// s_A := new(edwards25519.Scalar).MultiplyAdd(d, a, x) // s = x * y + z mod l
 
+		d_x_a := new(edwards25519.Scalar).Multiply(d, a)
+
+		s_A := new(edwards25519.Scalar).Add(d_x_a, x)
 		//Compute $\sigma_A}=(Y \cdot B^{e})^{s_A}
 
 		// B^e
@@ -363,6 +386,8 @@ func Agree_edwards25519(staticKeys *StaticKeys_edwards25519, ephemeralKeys *Ephe
 		Y_mul_B_pow_e := new(edwards25519.Point).Add(Y, B_pow_e)
 
 		sigma_A := new(edwards25519.Point).ScalarMult(s_A, Y_mul_B_pow_e)
+
+		fmt.Printf("Alice: sigma_A: %x\n", sigma_A.Bytes())
 
 		K = HMQV_Hash(sigma_A.Bytes(), nil, nil, "sha256")
 
@@ -389,9 +414,9 @@ func Agree_edwards25519(staticKeys *StaticKeys_edwards25519, ephemeralKeys *Ephe
 			return nil, fmt.Errorf("error in SetBytes - %v", err)
 		}
 
-		e_bytes := HMQV_Hash(nil, Y, A_bytes, "sha512")
+		e_bytes := HMQV_Hash(nil, Y, A.Bytes(), "sha512")
 
-		d_bytes := HMQV_Hash(nil, X_bytes, B, "sha512")
+		d_bytes := HMQV_Hash(nil, X.Bytes(), B, "sha512")
 
 		e, err := new(edwards25519.Scalar).SetBytesWithClamping(e_bytes)
 		if err != nil {
@@ -403,19 +428,23 @@ func Agree_edwards25519(staticKeys *StaticKeys_edwards25519, ephemeralKeys *Ephe
 			return nil, fmt.Errorf("error in SetCanonicalBytes (d)- %v", err)
 		}
 
-		y, err := new(edwards25519.Scalar).SetCanonicalBytes(eprivB)
+		y, err := Construct_RFC8032_Scalar(eprivB)
 		if err != nil {
 			return nil, fmt.Errorf("error in SetCanonicalBytes (x)- %v", err)
 		}
 
-		b, err := new(edwards25519.Scalar).SetCanonicalBytes(sprivB)
+		b, err := Construct_RFC8032_Scalar(sprivB)
 		if err != nil {
-			return nil, fmt.Errorf("error in SetCanonicalBytes (a)- %v", err)
+			return nil, fmt.Errorf("error in SetCanonicalBytes (b)- %v", err)
 		}
 
 		//Compute s_B = y + e.b mod I
 
-		s_B := new(edwards25519.Scalar).MultiplyAdd(e, b, y) // s = x * y + z mod l
+		// s_B := new(edwards25519.Scalar).MultiplyAdd(e, b, y) // s = x * y + z mod l
+
+		e_x_b := new(edwards25519.Scalar).Multiply(e, b)
+
+		s_B := new(edwards25519.Scalar).Add(e_x_b, y)
 
 		//Compute {\sigma_B}=(X \cdot A^{d})^{s_B} -- server
 
@@ -423,9 +452,10 @@ func Agree_edwards25519(staticKeys *StaticKeys_edwards25519, ephemeralKeys *Ephe
 		A_pow_d := new(edwards25519.Point).ScalarMult(d, A)
 
 		// X \cdot A^{d} -> X + A^d since \cdot == add on an ellipic curve
-		X_mul_A_pow_e := new(edwards25519.Point).Add(X, A_pow_d)
+		X_mul_A_pow_d := new(edwards25519.Point).Add(X, A_pow_d)
 
-		sigma_B := new(edwards25519.Point).ScalarMult(s_B, X_mul_A_pow_e)
+		sigma_B := new(edwards25519.Point).ScalarMult(s_B, X_mul_A_pow_d)
+		fmt.Printf("Bob: sigma_B: %x\n", sigma_B.Bytes())
 
 		K = HMQV_Hash(sigma_B.Bytes(), nil, nil, "sha256")
 
@@ -435,6 +465,7 @@ func Agree_edwards25519(staticKeys *StaticKeys_edwards25519, ephemeralKeys *Ephe
 
 // Returns an Edwards25519 private and publick key
 // the publick key is compressed to 32 byte format
+// Key generation follows RFC-8032
 func GenerateKeyPair_edwards25519() ([]byte, []byte, error) {
 	var privKeyBytes [32]byte
 	_, _ = io.ReadFull(rand.Reader, privKeyBytes[:])
@@ -444,12 +475,39 @@ func GenerateKeyPair_edwards25519() ([]byte, []byte, error) {
 		return nil, nil, err
 	}
 
-	// pub = privateKey * B, where B is the base point
-	pub := new(edwards25519.Point).ScalarBaseMult(privateKey)
+	priv_bytes := privateKey.Bytes()
 
-	// Canonical 32-byte encoding of v
-	pubKey := pub.Bytes()
+	hash := sha512.New()
+	hashLen := 32
+	hash.Write(priv_bytes)
 
-	return privateKey.Bytes(), pubKey, err
+	hash_digest := hash.Sum(nil)
+
+	priv_key_hash := hash_digest[:hashLen]
+
+	climped_hash_scalar, err := new(edwards25519.Scalar).SetBytesWithClamping(priv_key_hash)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	pub := new(edwards25519.Point).ScalarBaseMult(climped_hash_scalar)
+
+	return priv_bytes, pub.Bytes(), nil
+
+}
+
+// Returns an Edwards25519 private and publick key
+// the publick key is compressed to 32 byte format
+// This function is equivalent of GenerateKeyPair_edwards25519(), but it might be safer
+// sicne it uses inbuilt libraries to generate the key pair
+// Key generation follows RFC-8032
+func GenerateKeyPair_edwards25519_() ([]byte, []byte, error) {
+
+	_, priv, err := ed25519.GenerateKey(rand.Reader)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return priv.Seed(), priv.Public().(ed25519.PublicKey), nil
 
 }

@@ -56,13 +56,13 @@ func BenchmarkHMQV(b *testing.B) {
 }
 
 func TestHMQV_edwards25519(t *testing.T) {
-	sprivA, spubA, err := GenerateKeyPair_edwards25519()
+	sprivA, spubA, err := GenerateKeyPair_edwards25519_()
 	if err != nil {
 		t.Errorf("Error: %v\n", err)
 	}
 	staticKeysAlice := StaticKeys_edwards25519{sprivA, spubA}
 
-	sprivB, spubB, err := GenerateKeyPair_edwards25519()
+	sprivB, spubB, err := GenerateKeyPair_edwards25519_()
 	if err != nil {
 		t.Errorf("Error: %v\n", err)
 	}
@@ -70,13 +70,13 @@ func TestHMQV_edwards25519(t *testing.T) {
 
 	////////////////////////////////////////////////////
 
-	eprivA, epubA, err := GenerateKeyPair_edwards25519()
+	eprivA, epubA, err := GenerateKeyPair_edwards25519_()
 	if err != nil {
 		t.Errorf("Error: %v\n", err)
 	}
 	ephemeralKeysAlice := EphemeralKeys_edwards25519{eprivA, epubA}
 
-	eprivB, epubB, err := GenerateKeyPair_edwards25519()
+	eprivB, epubB, err := GenerateKeyPair_edwards25519_()
 	if err != nil {
 		t.Errorf("Error: %v\n", err)
 	}
