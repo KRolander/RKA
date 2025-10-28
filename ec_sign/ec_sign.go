@@ -79,3 +79,13 @@ func Sign_edwards25519(priv_ed25519 ed25519.PrivateKey, message []byte) []byte {
 func Verify_edwards25519(pub_edwards25519 ed25519.PublicKey, message []byte, signature []byte) bool {
 	return ed25519.Verify(pub_edwards25519, message, signature)
 }
+
+// Format edwards25519 private key - creates the edwards25519 from parts of the key
+// seed + public key
+func Format_edwards25519_priv(seed []byte, pubKey []byte) []byte {
+	privKey := make([]byte, 0)
+	privKey = append(privKey, seed...)
+	privKey = append(privKey, pubKey...)
+
+	return privKey
+}
