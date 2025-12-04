@@ -1,9 +1,6 @@
 package main
 
 import (
-	"ardka/ec_kem"
-	"ardka/ec_sign"
-	"ardka/hmqv"
 	"bytes"
 	"crypto/ed25519"
 	"crypto/elliptic"
@@ -12,6 +9,10 @@ import (
 	"fmt"
 	"math/big"
 	"testing"
+
+	"github.com/KRolander/RKA/ec_kem"
+	"github.com/KRolander/RKA/ec_sign"
+	"github.com/KRolander/RKA/hmqv"
 
 	"filippo.io/edwards25519"
 )

@@ -1,10 +1,11 @@
 package ec_sign
 
 import (
-	"ardka/hmqv"
 	"crypto/ed25519"
 	"fmt"
 	"testing"
+
+	"github.com/KRolander/RKA/hmqv"
 )
 
 // Test compatibility with crypto/edwards25519

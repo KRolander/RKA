@@ -4,12 +4,13 @@
 package ec_kem
 
 import (
-	"ardka/hmqv"
 	"crypto/ed25519"
 	"crypto/elliptic"
 	"crypto/rand"
 	"fmt"
 	"io"
+
+	"github.com/KRolander/RKA/hmqv"
 
 	"errors"
 	"hash"

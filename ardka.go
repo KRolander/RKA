@@ -4,17 +4,18 @@
 package main
 
 import (
-	"ardka/ec_kem"
-	"ardka/ec_sign"
+	"github.com/KRolander/RKA/ec_kem"
+	"github.com/KRolander/RKA/ec_sign"
 
 	"os"
 
-	"ardka/hmqv"
 	"crypto/elliptic"
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
 	"math/big"
+
+	"github.com/KRolander/RKA/hmqv"
 )
 
 type StaticKeys struct {
