@@ -387,8 +387,6 @@ func Agree_edwards25519(staticKeys *StaticKeys_edwards25519, ephemeralKeys *Ephe
 
 		sigma_A := new(edwards25519.Point).ScalarMult(s_A, Y_mul_B_pow_e)
 
-		fmt.Printf("Alice: sigma_A: %x\n", sigma_A.Bytes())
-
 		K = HMQV_Hash(sigma_A.Bytes(), nil, nil, "sha256")
 
 	} else {
@@ -455,7 +453,6 @@ func Agree_edwards25519(staticKeys *StaticKeys_edwards25519, ephemeralKeys *Ephe
 		X_mul_A_pow_d := new(edwards25519.Point).Add(X, A_pow_d)
 
 		sigma_B := new(edwards25519.Point).ScalarMult(s_B, X_mul_A_pow_d)
-		fmt.Printf("Bob: sigma_B: %x\n", sigma_B.Bytes())
 
 		K = HMQV_Hash(sigma_B.Bytes(), nil, nil, "sha256")
 
